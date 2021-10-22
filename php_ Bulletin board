@@ -1,7 +1,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>mission_5-1</title>
+    <title>bulletin_board</title>
 </head>
 <body>  
   
@@ -14,8 +14,8 @@
         $pdo = new PDO
         ($dsn, $user, $password, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING));
 
-     　 //テーブルを作成
-        $sql = "CREATE TABLE IF NOT EXISTS bulletin-board"
+        //テーブルを作成
+        $sql = "CREATE TABLE IF NOT EXISTS bulletin_board"
         ." ("
         . "id INT AUTO_INCREMENT PRIMARY KEY,"
         . "name char(32),"
@@ -25,7 +25,7 @@
         .");";
         $stmt = $pdo->query($sql);
         
-        $date=date ( "Y年m月d日 H時i分s秒" );
+        $date = date ( "Y年m月d日 H時i分s秒" );
         
         
         //編集フォームから送信があった場合
@@ -35,7 +35,7 @@
             $edit_pass=$_POST["edit_pass"];
             
             //テーブルの内容を配列に読み込む
-            $sql = 'SELECT * FROM bulletin-board';
+            $sql = 'SELECT * FROM bulletin_board';
             $stmt = $pdo->query($sql);
             $results = $stmt->fetchAll();
             
@@ -68,7 +68,7 @@
                     //編集タグの番号とidが一致する行を，新しい投稿内容に書き換える
                     $edit_tag=$_POST["edit_tag"];
                     $id = $edit_tag; 
-                    $sql = 'UPDATE bulletin-board SET name=:name,comment=:comment,passward=:passward,date=:date WHERE id=:id';
+                    $sql = 'UPDATE bulletin_board SET name=:name,comment=:comment,passward=:passward,date=:date WHERE id=:id';
                     $stmt = $pdo->prepare($sql);
                     $stmt->bindParam(':name', $name, PDO::PARAM_STR);
                     $stmt->bindParam(':comment', $comment, PDO::PARAM_STR);
@@ -81,7 +81,7 @@
                 //編集タグがない場合
                 else {
                     //テーブルに投稿内容を追記する
-                    $sql = $pdo -> prepare("INSERT INTO bulletin-board (name, comment, passward, date) 
+                    $sql = $pdo -> prepare("INSERT INTO bulletin_board (name, comment, passward, date) 
                     VALUES (:name, :comment, :passward, :date)");
                     $sql -> bindParam(':name', $name, PDO::PARAM_STR);
                     $sql -> bindParam(':comment', $comment, PDO::PARAM_STR);
@@ -102,7 +102,7 @@
             $del_pass=$_POST["del_pass"];
             
             //テーブルの内容を配列に読み込む
-            $sql = 'SELECT * FROM bulletin-board';
+            $sql = 'SELECT * FROM bulletin_board';
             $stmt = $pdo->query($sql);
             $results = $stmt->fetchAll();
             //テーブルの各行に対して以下の処理を行う
@@ -110,7 +110,7 @@
                 //idが削除番号と一致し，かつパスワードが一致した場合
                 if ($row["id"]==$del && $row["passward"]==$del_pass){
                     $id = $del;
-                    $sql = 'delete from bulletin-board where id=:id';
+                    $sql = 'delete from bulletin_board where id=:id';
                     $stmt = $pdo->prepare($sql);
                     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
                     $stmt->execute();
@@ -147,13 +147,13 @@
     
     <form action="" method="post">    
         <input type="number" name="delete" placeholder="削除対象番号">
-        <input type="text" name="del_pass" placeholder="パスワード">
+        <input type="password" name="del_pass" placeholder="パスワード">
         <input type="submit" name="submit" value="削除">
     </form>
     
     <form action="" method="post">
         <input type="number" name="edit_num" placeholder="編集対象番号">
-        <input type="text" name="edit_pass" placeholder="パスワード">
+        <input type="password" name="edit_pass" placeholder="パスワード">
         <input type="submit" name="submit" value="編集">
     </form>
     
@@ -162,8 +162,8 @@
     <?php
     
         //テーブルの内容を配列に読み込む
-        $sql = 'SELECT * FROM bulletin-board';
-        $stmt = $pdo->query($sql);
+        $sql = 'SELECT * FROM bulletin_board';
+        $stmt = $pdo -> query($sql);
         $results = $stmt->fetchAll();
         //パスワード以外の内容をブラウザに表示する
         foreach ($results as $row){
