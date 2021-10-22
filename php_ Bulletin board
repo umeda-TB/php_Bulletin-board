@@ -14,15 +14,18 @@
         $pdo = new PDO
         ($dsn, $user, $password, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING));
 
-        //テーブルを作成
-        $sql = "CREATE TABLE IF NOT EXISTS tbtest2"
+     　 //テーブルを作成
+        $sql = "CREATE TABLE IF NOT EXISTS bulletin-board"
         ." ("
         . "id INT AUTO_INCREMENT PRIMARY KEY,"
         . "name char(32),"
         . "comment TEXT,"
-        . "passward char(32)"
+        . "passward char(32),"
+        . "date TEXT"
         .");";
         $stmt = $pdo->query($sql);
+        
+        $date=date ( "Y年m月d日 H時i分s秒" );
         
         
         //編集フォームから送信があった場合
@@ -32,7 +35,7 @@
             $edit_pass=$_POST["edit_pass"];
             
             //テーブルの内容を配列に読み込む
-            $sql = 'SELECT * FROM tbtest2';
+            $sql = 'SELECT * FROM bulletin-board';
             $stmt = $pdo->query($sql);
             $results = $stmt->fetchAll();
             
@@ -65,23 +68,25 @@
                     //編集タグの番号とidが一致する行を，新しい投稿内容に書き換える
                     $edit_tag=$_POST["edit_tag"];
                     $id = $edit_tag; 
-                    $sql = 'UPDATE tbtest2 SET name=:name,comment=:comment,passward=:passward WHERE id=:id';
+                    $sql = 'UPDATE bulletin-board SET name=:name,comment=:comment,passward=:passward,date=:date WHERE id=:id';
                     $stmt = $pdo->prepare($sql);
                     $stmt->bindParam(':name', $name, PDO::PARAM_STR);
                     $stmt->bindParam(':comment', $comment, PDO::PARAM_STR);
                     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
                     $stmt->bindParam(':passward',$post_pass, PDO::PARAM_STR);
+                    $stmt->bindParam(':date',$date, PDO::PARAM_STR);          
                     $stmt->execute();
                 }
                 
                 //編集タグがない場合
                 else {
                     //テーブルに投稿内容を追記する
-                    $sql = $pdo -> prepare("INSERT INTO tbtest2 (name, comment, passward) 
-                    VALUES (:name, :comment, :passward)");
+                    $sql = $pdo -> prepare("INSERT INTO bulletin-board (name, comment, passward, date) 
+                    VALUES (:name, :comment, :passward, :date)");
                     $sql -> bindParam(':name', $name, PDO::PARAM_STR);
                     $sql -> bindParam(':comment', $comment, PDO::PARAM_STR);
                     $sql -> bindParam(':passward', $post_pass, PDO::PARAM_STR);
+                    $sql -> bindParam(':date',$date, PDO::PARAM_STR);
                     $sql -> execute();
                 }
             }
@@ -97,7 +102,7 @@
             $del_pass=$_POST["del_pass"];
             
             //テーブルの内容を配列に読み込む
-            $sql = 'SELECT * FROM tbtest2';
+            $sql = 'SELECT * FROM bulletin-board';
             $stmt = $pdo->query($sql);
             $results = $stmt->fetchAll();
             //テーブルの各行に対して以下の処理を行う
@@ -105,7 +110,7 @@
                 //idが削除番号と一致し，かつパスワードが一致した場合
                 if ($row["id"]==$del && $row["passward"]==$del_pass){
                     $id = $del;
-                    $sql = 'delete from tbtest2 where id=:id';
+                    $sql = 'delete from bulletin-board where id=:id';
                     $stmt = $pdo->prepare($sql);
                     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
                     $stmt->execute();
@@ -129,7 +134,7 @@
         placeholder="コメント"
         size="50">
         
-        <input type="text" name="post_pass" 
+        <input type="password" name="post_pass" 
         value="<?php if (isset($edit_pass)){echo $edit_pass;} ?>"
         placeholder="パスワード">
         
@@ -157,14 +162,15 @@
     <?php
     
         //テーブルの内容を配列に読み込む
-        $sql = 'SELECT * FROM tbtest2';
+        $sql = 'SELECT * FROM bulletin-board';
         $stmt = $pdo->query($sql);
         $results = $stmt->fetchAll();
         //パスワード以外の内容をブラウザに表示する
         foreach ($results as $row){
             echo $row['id'].',';
             echo $row['name'].',';
-            echo $row['comment'].'<br>';
+            echo $row['comment'].',';
+            echo $row['date'].'<br>';
             echo "<hr>";
         }
     
